@@ -1,0 +1,106 @@
+<div class="form-container">
+  <div class="header">
+    <h2>{{ form.get('id')?.value ? 'Editar Motor' : 'Novo Motor' }}</h2>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()">
+    <div class="form-group full-width">
+      <label for="nome">Nome do Motor</label>
+      <input id="nome" type="text" formControlName="nome" placeholder="Ex: V8 4.0 Twin-Turbo">
+      @if (form.get('nome')?.invalid && form.get('nome')?.touched) {
+        <small class="error">O nome é obrigatório (mín. 3 caracteres).</small>
+      }
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="cilindrada">Cilindrada (cc)</label>
+        <input id="cilindrada" type="number" formControlName="cilindrada" placeholder="0">
+      </div>
+
+      <div class="form-group">
+        <label for="potencia">Potência (cv)</label>
+        <input id="potencia" type="number" formControlName="potencia" placeholder="0">
+      </div>
+
+      <div class="form-group">
+        <label for="torque">Torque (kgfm)</label>
+        <input id="torque" type="number" formControlName="torque" placeholder="0">
+      </div>
+
+      <div class="form-group">
+        <label for="taxaCompressao">Taxa de Compressão</label>
+        <input id="taxaCompressao" type="number" formControlName="taxaCompressao" placeholder="0.0" step="0.1">
+      </div>
+
+      <div class="form-group">
+        <label for="rpmMax">RPM Máximo</label>
+        <input id="rpmMax" type="number" formControlName="rpmMax" placeholder="0">
+      </div>
+
+      <div class="form-group">
+        <label for="preco">Preço (R$)</label>
+        <input id="preco" type="number" formControlName="preco" placeholder="0.00">
+      </div>
+    </div>
+
+    <div class="section-title">Componentes e Sobrealimentação</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="idRadiadores">Radiadores</label>
+        <select id="idRadiadores" formControlName="idRadiadores" multiple class="multi-select">
+          @for (r of radiadores; track r.id) {
+            <option [value]="r.id">{{ r.marca }} - {{ r.tipo }}</option>
+          }
+        </select>
+        <small class="hint">Segure Ctrl para selecionar múltiplos</small>
+      </div>
+
+      <div class="form-group">
+        <label for="idPistoes">Pistões</label>
+        <select id="idPistoes" formControlName="idPistoes" multiple class="multi-select">
+          @for (p of pistoes; track p.id) {
+            <option [value]="p.id">{{ p.marca }} - {{ p.material }}</option>
+          }
+        </select>
+        <small class="hint">Segure Ctrl para selecionar múltiplos</small>
+      </div>
+
+      <div class="form-group">
+        <label for="idSobrealimentacao">Sobrealimentação (Turbo ou Supercharger)</label>
+        <select id="idSobrealimentacao" formControlName="idSobrealimentacao">
+          <option [ngValue]="null">Nenhuma / Aspirado</option>
+          
+          <optgroup label="Turbos">
+            @for (t of turbos; track t.id) {
+              <option [value]="t.id">Turbo: {{ t.fabricante }} - {{ t.tipoTurbo }}</option>
+            }
+          </optgroup>
+
+          <optgroup label="Superchargers">
+            @for (sc of superChargers; track sc.id) {
+              <option [value]="sc.id">SC: {{ sc.fabricante }} - {{ sc.tipoSupercharger }}</option>
+            }
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="idVeiculos">Veículos Compatíveis</label>
+        <select id="idVeiculos" formControlName="idVeiculos" multiple class="multi-select">
+          @for (v of veiculos; track v.id) {
+            <option [value]="v.id">{{ v.nome }} ({{ v.modelo }})</option>
+          }
+        </select>
+        <small class="hint">Segure Ctrl para selecionar múltiplos veículos que podem usar este motor.</small>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" routerLink="/motores" class="btn btn-secondary">Cancelar</button>
+      <button type="submit" [disabled]="form.invalid" class="btn btn-primary">
+        {{ form.get('id')?.value ? 'Salvar Alterações' : 'Cadastrar Motor' }}
+      </button>
+    </div>
+  </form>
+</div>

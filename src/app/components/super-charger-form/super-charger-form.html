@@ -1,0 +1,51 @@
+<div class="form-container">
+  <div class="header">
+    <h2>{{ form.get('id')?.value ? 'Editar Supercharger' : 'Novo Supercharger' }}</h2>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()">
+    <div class="form-group full-width">
+      <label for="fabricante">Fabricante</label>
+      <input id="fabricante" type="text" formControlName="fabricante" placeholder="Ex: Whipple, Eaton">
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="tipoSupercharger">Tipo de Supercharger</label>
+        <select id="tipoSupercharger" formControlName="tipoSupercharger">
+          <option value="">Selecione...</option>
+          @for (tipo of tiposSuperCharger; track tipo.id) {
+            <option [value]="tipo.id">{{ tipo.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="idTipoAcionamento">Tipo de Acionamento</label>
+        <select id="idTipoAcionamento" formControlName="idTipoAcionamento">
+          <option [ngValue]="null">Selecione...</option>
+          @for (tipo of tiposAcionamento; track tipo.id) {
+            <option [value]="tipo.id">{{ tipo.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="tamanhoPolia">Tamanho da Polia (pol)</label>
+        <input id="tamanhoPolia" type="number" formControlName="tamanhoPolia" step="0.01" placeholder="0.00">
+      </div>
+
+      <div class="form-group">
+        <label for="padraoCorreia">Padrão da Correia</label>
+        <input id="padraoCorreia" type="text" formControlName="padraoCorreia" placeholder="Ex: 8PK">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" routerLink="/superchargers" class="btn btn-secondary">Cancelar</button>
+      <button type="submit" [disabled]="form.invalid" class="btn btn-primary">
+        {{ form.get('id')?.value ? 'Salvar Alterações' : 'Cadastrar Supercharger' }}
+      </button>
+    </div>
+  </form>
+</div>
