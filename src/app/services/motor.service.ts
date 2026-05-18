@@ -65,4 +65,17 @@ export class MotorService {
   delete(id: number | string): Observable<void> {
     return this.httpClient.delete<void>(`${this.api}/${id}`);
   }
+
+  // Enviar imagem para o SeaweedFS
+  uploadImagem(idMotor: number, file: File): Observable<void> {
+    const formData = new FormData();
+    formData.append('idMotor', idMotor.toString());
+    formData.append('file', file);
+    return this.httpClient.patch<void>(`${this.api}/images/upload`, formData);
+  }
+
+  // Deletar imagem do SeaweedFS e DB
+  removerImagem(fid: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.api}/images/${fid}`);
+  }
 }

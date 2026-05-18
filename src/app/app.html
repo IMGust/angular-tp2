@@ -1,81 +1,77 @@
 <div class="app-layout">
   
-  <!-- SIDEBAR INTERATIVA -->
-  <aside class="app-sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-icon">
-        <!-- SVG de Motor Flat -->
-        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="width: 34px; height: 34px; color: white;">
-          <path d="M7 2H9V4H7V2Z"/>
-          <path d="M11 2H13V4H11V2Z"/>
-          <path d="M15 2H17V4H15V2Z"/>
-          <path d="M19 2H21V4H19V2Z"/>
-          <path d="M6 5H22V10H6V5Z"/>
-          <path d="M8 11H20V12H8V11Z"/>
-          <path d="M11 13H21V20H15L12 23L9 20V13H11Z"/>
-          <path d="M4 11H9V14H6V18H4V11Z"/>
-          <circle cx="15" cy="17" r="4.5" stroke="currentColor" stroke-width="1" fill="none"/>
-          <circle cx="15" cy="17" r="1.5" fill="currentColor"/>
-          <path d="M15 13V15M15 19V21M11 17H13M17 17H19" stroke="currentColor" stroke-width="0.8"/>
-        </svg>
+  <!-- SIDEBAR INTERATIVA - Apenas exibida no Painel Administrativo -->
+  @if (showAdminLayout()) {
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <img src="logo.png" alt="Logo" class="sidebar-logo-img" />
+        </div>
+        <div class="brand-text">
+          <h1>Motor-Api</h1>
+          <span>SISTEMA TÉCNICO</span>
+        </div>
       </div>
-      <div class="brand-text">
-        <h1>Motor-Api</h1>
-        <span>SISTEMA TÉCNICO</span>
-      </div>
-    </div>
 
-    <nav class="sidebar-nav">
-      <p class="nav-label">CADASTROS</p>
-      
-      <a routerLink="/motores" routerLinkActive="active-link">
-        <span class="nav-icon">🚀</span> Motores
-      </a>
-      
-      <a routerLink="/pistoes" routerLinkActive="active-link">
-        <span class="nav-icon">🔩</span> Pistões
-      </a>
-      
-      <a routerLink="/radiadores" routerLinkActive="active-link">
-        <span class="nav-icon">🌡️</span> Radiadores
-      </a>
-      
-      <a routerLink="/turbos" routerLinkActive="active-link">
-        <span class="nav-icon">🌀</span> Turbos
-      </a>
-      
-      <a routerLink="/superchargers" routerLinkActive="active-link">
-        <span class="nav-icon">⚡</span> Superchargers
-      </a>
-      
-      <a routerLink="/veiculos" routerLinkActive="active-link">
-        <span class="nav-icon">🏎️</span> Veículos
-      </a>
-    </nav>
+      <nav class="sidebar-nav">
+        <p class="nav-label">CADASTROS</p>
+        
+        <a routerLink="/motores" routerLinkActive="active-link">
+          <span class="nav-icon">🚀</span> Motores
+        </a>
+        
+        <a routerLink="/pistoes" routerLinkActive="active-link">
+          <span class="nav-icon">🔩</span> Pistões
+        </a>
+        
+        <a routerLink="/radiadores" routerLinkActive="active-link">
+          <span class="nav-icon">🌡️</span> Radiadores
+        </a>
+        
+        <a routerLink="/turbos" routerLinkActive="active-link">
+          <span class="nav-icon">🌀</span> Turbos
+        </a>
+        
+        <a routerLink="/superchargers" routerLinkActive="active-link">
+          <span class="nav-icon">⚡</span> Superchargers
+        </a>
+        
+        <a routerLink="/veiculos" routerLinkActive="active-link">
+          <span class="nav-icon">🏎️</span> Veículos
+        </a>
+      </nav>
 
-    <div class="sidebar-user">
-      <div class="user-avatar">G</div>
-      <div class="user-details">
-        <p class="user-name">Gustavo</p>
-        <p class="user-status">Online</p>
+      <div class="sidebar-user">
+        <div class="user-avatar">G</div>
+        <div class="user-details">
+          <p class="user-name">Gustavo</p>
+          <p class="user-status">Online</p>
+        </div>
+        <!-- Botão de Sair do Painel -->
+        <button class="logout-sidebar-btn" (click)="logout()" title="Sair do Painel">
+          🚪 Sair
+        </button>
       </div>
-    </div>
-  </aside>
+    </aside>
+  }
 
   <!-- CONTEÚDO PRINCIPAL -->
-  <main class="app-content">
-    <header class="content-header">
-      <div class="breadcrumb">Gerenciamento de Componentes</div>
-      
-      <!-- Botão Dinâmico Inteligente -->
-      <button class="add-btn" [routerLink]="actionInfo().link">
-        + {{ actionInfo().label }}
-      </button>
-    </header>
+  <main class="app-content" [class.no-sidebar]="!showAdminLayout()">
+    @if (showAdminLayout()) {
+      <header class="content-header">
+        <div class="breadcrumb">Gerenciamento de Componentes</div>
+        
+        <!-- Botão Dinâmico Inteligente -->
+        <button class="add-btn" [routerLink]="actionInfo().link">
+          + {{ actionInfo().label }}
+        </button>
+      </header>
+    }
 
-    <div class="content-body">
+    <div class="content-body" [class.no-padding]="!showAdminLayout()">
       <router-outlet />
     </div>
   </main>
 
 </div>
+

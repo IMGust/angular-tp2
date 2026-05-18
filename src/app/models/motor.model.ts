@@ -1,3 +1,8 @@
+export interface ArquivoResponse {
+  nomeOriginal: string;
+  fid: string;
+}
+
 export interface Motor {
   id?: number;
   nome: string;
@@ -11,9 +16,11 @@ export interface Motor {
   veiculosCompativeis?: any[];
   pistoes?: any[];
   sobrealimentacao?: any;
+  imagens?: ArquivoResponse[];
   // Campos para Request (DTO)
   idRadiadores?: number[];
   idPistoes?: number[];
   idVeiculos?: number[];
   idSobrealimentacao?: number;
 }
+

@@ -96,6 +96,33 @@
       </div>
     </div>
 
+    <div class="section-title">Galeria de Imagens</div>
+    
+    @if (form.get('id')?.value) {
+      <div class="image-management-card">
+        <div class="image-info">
+          <span class="image-icon">🖼️</span>
+          <div class="image-text">
+            <strong>{{ motorImagens.length }} imagem(ns) vinculada(s)</strong>
+            <p class="hint">Gerencie e envie as fotos reais deste motor para exibição no catálogo.</p>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary btn-manage-images" (click)="openImageModal()">
+          📸 Gerenciar Imagens
+        </button>
+      </div>
+    } @else {
+      <div class="image-management-card disabled">
+        <div class="image-info">
+          <span class="image-icon">🔒</span>
+          <div class="image-text">
+            <strong>Envio de Imagens Indisponível</strong>
+            <p class="hint">As imagens reais poderão ser associadas e enviadas no SeaweedFS após salvar o cadastro inicial deste motor.</p>
+          </div>
+        </div>
+      </div>
+    }
+
     <div class="form-actions">
       <button type="button" routerLink="/motores" class="btn btn-secondary">Cancelar</button>
       <button type="submit" [disabled]="form.invalid" class="btn btn-primary">
@@ -104,3 +131,83 @@
     </div>
   </form>
 </div>
+
+<!-- JANELA FLUTUANTE (MODAL) PARA UPLOAD E GERENCIAMENTO DE IMAGENS -->
+@if (showImageModal) {
+  <div class="modal-backdrop" (click)="closeImageModal()">
+    <div class="modal-window" (click)="$event.stopPropagation()">
+      
+      <div class="modal-header">
+        <h3>🖼️ Imagens do Motor - SeaweedFS</h3>
+        <button type="button" class="close-modal-btn" (click)="closeImageModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Drag & Drop Zone -->
+        <div class="upload-dropzone" 
+             [class.dragging]="isDragging"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event)"
+             (click)="fileInput.click()">
+          
+          <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" multiple style="display: none;">
+          <span class="cloud-icon">📤</span>
+          <p class="upload-title">Arraste e solte suas imagens aqui</p>
+          <p class="upload-sub">ou clique para navegar e selecionar arquivos</p>
+          <span class="upload-hint">Formatos suportados: PNG, JPG, JPEG, GIF, WEBP</span>
+        </div>
+
+        <!-- Indicador de Envio -->
+        @if (isUploading) {
+          <div class="upload-progress-bar">
+            <div class="progress-spinner"></div>
+            <span>Enviando arquivos de forma segura para o SeaweedFS...</span>
+          </div>
+        }
+
+        <!-- Alertas de Feedback -->
+        @if (uploadMessage) {
+          <div class="upload-alert" [class.success]="isUploadSuccess" [class.error]="!isUploadSuccess">
+            {{ uploadMessage }}
+          </div>
+        }
+
+        <!-- Galeria Interna do Modal -->
+        <div class="gallery-section">
+          <h4 class="gallery-title">Fotos Cadastradas ({{ motorImagens.length }})</h4>
+          
+          <div class="gallery-grid">
+            @for (img of motorImagens; track img.fid) {
+              <div class="gallery-card">
+                <div class="img-container">
+                  <img [src]="getImageUrl(img.fid)" [alt]="img.nomeOriginal" />
+                </div>
+                <div class="card-details">
+                  <span class="file-name" [title]="img.nomeOriginal">{{ img.nomeOriginal }}</span>
+                  <button type="button" class="btn-delete-image" (click)="deleteImage(img.fid)" title="Excluir imagem do SeaweedFS">
+                    🗑️ Excluir
+                  </button>
+                </div>
+              </div>
+            } @empty {
+              <div class="empty-gallery-state">
+                <span class="empty-icon">📷</span>
+                <p>Nenhuma imagem cadastrada para este motor.</p>
+                <small>Adicione fotos para deixar o catálogo do motor incrível!</small>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-window-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeImageModal()">Fechar Janela</button>
+      </div>
+
+    </div>
+  </div>
+}
+
