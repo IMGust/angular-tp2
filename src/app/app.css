@@ -57,7 +57,7 @@ body {
 
 .sidebar-brand:hover .brand-icon {
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(255, 106, 0, 0.25);
+  box-shadow: 0 6px 12px rgba(255, 255, 255, 0.15);
 }
 
 .sidebar-brand:hover .sidebar-logo-img {
@@ -67,7 +67,7 @@ body {
 .brand-text h1 {
   font-size: 18px;
   margin: 0;
-  color: #ff6a00;
+  color: #ffffff;
   letter-spacing: 1px;
 }
 
@@ -109,8 +109,8 @@ body {
 }
 
 .sidebar-nav a.active-link {
-  background: rgba(255,106,0,0.1);
-  color: #ff6a00;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -170,9 +170,9 @@ body {
 }
 
 .add-btn {
-  background: #ff6a00;
+  background: #0f172a;
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 600;
@@ -181,7 +181,7 @@ body {
 }
 
 .add-btn:hover {
-  background: #e65f00;
+  background: #1e293b;
   transform: translateY(-1px);
 }
 
@@ -214,65 +214,22 @@ body {
 
 /* EFEITO DE MICRO-ANIMAÇÕES NO LOGO DE MOTOR (EFETUADAS DIRETAMENTE NO LOGO-IMG) */
 
-/* ANIMAÇÕES INTERATIVAS NOS ÍCONES DOS CADASTROS (EMOJIS) */
-.sidebar-nav a .nav-icon {
+/* ANIMAÇÕES INTERATIVAS NOS ÍCONES DOS CADASTROS (EMOJIS E IMAGENS) */
+.sidebar-nav a .nav-icon,
+.sidebar-nav-icon {
   display: inline-block;
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Motores (Foguete): Balança em vibração vertical de decolagem */
-.sidebar-nav a[routerLink="/motores"]:hover .nav-icon {
-  animation: rocket-launch 0.4s infinite ease-in-out;
-}
-@keyframes rocket-launch {
-  0%, 100% { transform: translateY(0) rotate(-3deg); }
-  50% { transform: translateY(-3px) rotate(3deg); }
+.sidebar-nav-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
 }
 
-/* Pistões (Parafuso/Pistão): Movimento compressão vertical */
-.sidebar-nav a[routerLink="/pistoes"]:hover .nav-icon {
-  animation: piston-compress 0.5s infinite alternate ease-in-out;
-}
-@keyframes piston-compress {
-  0% { transform: scaleY(1); }
-  100% { transform: scaleY(0.7) translateY(2px); }
-}
-
-/* Radiadores (Termômetro): Vibração de alta temperatura */
-.sidebar-nav a[routerLink="/radiadores"]:hover .nav-icon {
-  animation: temp-shiver 0.15s infinite;
-}
-@keyframes temp-shiver {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(-1px, 1px) rotate(-1deg); }
-  75% { transform: translate(1px, -1px) rotate(1deg); }
-}
-
-/* Turbos (Ciclone): Rotação contínua e rápida */
-.sidebar-nav a[routerLink="/turbos"]:hover .nav-icon {
-  animation: turbo-spin 0.6s infinite linear;
-}
-@keyframes turbo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Superchargers (Raio): Efeito pulsar com flash de luz */
-.sidebar-nav a[routerLink="/superchargers"]:hover .nav-icon {
-  animation: lightning-flash 0.8s infinite ease-in-out;
-}
-@keyframes lightning-flash {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px orange); }
-  50% { transform: scale(1.3); filter: drop-shadow(0 0 8px orange); }
-}
-
-/* Veículos (Carro): Avanço horizontal simulando arrancada */
-.sidebar-nav a[routerLink="/veiculos"]:hover .nav-icon {
-  animation: car-drive 0.6s infinite alternate ease-in-out;
-}
-@keyframes car-drive {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(5px); }
+.sidebar-nav a:hover .nav-icon,
+.sidebar-nav a:hover .sidebar-nav-icon {
+  transform: scale(1.12);
 }
 
 /* RESPONSIVIDADE */

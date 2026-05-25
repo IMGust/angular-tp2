@@ -121,7 +121,11 @@ export class ProductCatalog implements OnInit {
     return this.getProductImage(item);
   }
 
-  // Helper method to return SeaweedFS images or fall back to Unsplash
+  isIcon(url: string): boolean {
+    return url ? (url.endsWith('.png') && !url.includes('http://localhost:8080')) : false;
+  }
+
+  // Helper method to return SeaweedFS images or fall back to Unsplash/Local Icons
   getProductImage(item: any): string {
     if (item && item.imagens && item.imagens.length > 0) {
       return `http://localhost:8080/motor/images/download/${item.imagens[0].fid}`;
@@ -129,51 +133,28 @@ export class ProductCatalog implements OnInit {
 
     const tab = this.activeTab();
     const seed = item.id || 1;
-    
-    // Curated high quality automotive images based on categories
-    const engineImages = [
-      'https://images.unsplash.com/photo-1597404294360-fedede44308e?q=80&w=600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1613214150384-8e9c3f6d0d15?q=80&w=600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=600&auto=format&fit=crop'
-    ];
-    
-    const pistonImages = [
-      'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop', // engineering parts
-      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600&auto=format&fit=crop'
-    ];
-
-    const radiatorImages = [
-      'https://images.unsplash.com/photo-1616422285623-13ff0162193c?q=80&w=600&auto=format&fit=crop', // machinery/cooling
-      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop'
-    ];
-
-    const turboImages = [
-      'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=600&auto=format&fit=crop', // turbine/induction
-      'https://images.unsplash.com/photo-1600706432502-75a0e273b885?q=80&w=600&auto=format&fit=crop'
-    ];
-
-    const vehicleImages = [
-      'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=600&auto=format&fit=crop', // sports car
-      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=600&auto=format&fit=crop'
-    ];
 
     switch (tab) {
       case 'motores':
-        return engineImages[seed % engineImages.length];
+        return 'motor.png';
       case 'pistoes':
-        return pistonImages[seed % pistonImages.length];
+        return 'pistao.png';
       case 'radiadores':
-        return radiatorImages[seed % radiatorImages.length];
+        return 'radiador.png';
       case 'turbos':
+        return 'turbo.png';
       case 'superchargers':
-        return turboImages[seed % turboImages.length];
+        return 'turbo.png';
       case 'veiculos':
+        const vehicleImages = [
+          'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=600&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=600&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=600&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=600&auto=format&fit=crop'
+        ];
         return vehicleImages[seed % vehicleImages.length];
       default:
-        return engineImages[0];
+        return 'motor.png';
     }
   }
 

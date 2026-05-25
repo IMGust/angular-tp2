@@ -27,30 +27,22 @@
     </div>
   </header>
 
-  <!-- HERO SECTION -->
-  <section class="hero-section">
-    <div class="hero-glow"></div>
-    <div class="hero-content">
-      <span class="tagline">TECNOLOGIA AUTOMOTIVA DE PONTA</span>
-      <h2>Motores & Peças de Alta Performance</h2>
-      <p>Navegue pelas especificações técnicas, compatibilidades e preços dos componentes mecânicos mais potentes do mercado.</p>
-    </div>
-  </section>
+
 
   <!-- NAVEGAÇÃO E BUSCA -->
   <div class="catalog-controls">
     <nav class="catalog-tabs">
       <button [class.active]="activeTab() === 'motores'" (click)="setTab('motores')">
-        <span class="tab-emoji">🚀</span> Motores
+        <img src="motor.png" alt="Motores" class="tab-icon" /> Motores
       </button>
       <button [class.active]="activeTab() === 'pistoes'" (click)="setTab('pistoes')">
-        <span class="tab-emoji">🔩</span> Pistões
+        <img src="pistao.png" alt="Pistões" class="tab-icon" /> Pistões
       </button>
       <button [class.active]="activeTab() === 'radiadores'" (click)="setTab('radiadores')">
-        <span class="tab-emoji">🌡️</span> Radiadores
+        <img src="radiador.png" alt="Radiadores" class="tab-icon" /> Radiadores
       </button>
       <button [class.active]="activeTab() === 'turbos'" (click)="setTab('turbos')">
-        <span class="tab-emoji">🌀</span> Turbos
+        <img src="turbo.png" alt="Turbos" class="tab-icon" /> Turbos
       </button>
       <button [class.active]="activeTab() === 'superchargers'" (click)="setTab('superchargers')">
         <span class="tab-emoji">⚡</span> Superchargers
@@ -85,8 +77,8 @@
     <div class="products-grid">
       @for (item of filteredItems(); track item.id) {
         <div class="product-card">
-          <div class="card-img-wrapper">
-            <img [src]="getProductImage(item)" [alt]="item.nome" loading="lazy" />
+          <div class="card-img-wrapper" [class.is-icon-bg]="isIcon(getProductImage(item))">
+            <img [src]="getProductImage(item)" [alt]="item.nome" loading="lazy" [class.is-icon]="isIcon(getProductImage(item))" />
             
             <!-- Badge Customizado por Tipo -->
             @if (activeTab() === 'motores') {
@@ -167,8 +159,8 @@
         <button class="modal-close" (click)="closeDetails()">×</button>
         
         <div class="modal-layout">
-          <div class="modal-img-section">
-            <img [src]="getSelectedProductImage(selectedItem())" [alt]="selectedItem().nome" />
+          <div class="modal-img-section" [class.is-icon-bg]="isIcon(getSelectedProductImage(selectedItem()))">
+            <img [src]="getSelectedProductImage(selectedItem())" [alt]="selectedItem().nome" [class.is-icon]="isIcon(getSelectedProductImage(selectedItem()))" />
             
             @if (selectedItem().preco !== undefined) {
               <div class="price-tag">
