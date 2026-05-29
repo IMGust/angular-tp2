@@ -6,8 +6,8 @@
       <div class="brand-badge">
         <img src="logo.png" alt="Logo" class="login-logo-img" />
       </div>
-      <h2>Painel Administrativo</h2>
-      <p>Gerenciamento de Motores e Componentes Técnicos</p>
+      <h2>{{ isRegisterMode() ? 'Criar Conta' : 'Acesso ao Painel' }}</h2>
+      <p>{{ isRegisterMode() ? 'Cadastre-se para acessar o painel de gerenciamento' : 'Gerenciamento de Motores e Componentes Técnicos' }}</p>
     </div>
 
     <!-- Mensagem de Erro animada -->
@@ -18,11 +18,55 @@
       </div>
     }
 
+    <!-- Mensagem de Sucesso animada -->
+    @if (successMessage()) {
+      <div class="success-container">
+        <span class="success-icon">✅</span>
+        <span class="success-text">{{ successMessage() }}</span>
+      </div>
+    }
+
     <form (ngSubmit)="onSubmit()" class="login-form">
+      @if (isRegisterMode()) {
+        <div class="input-group">
+          <label for="name">Nome Completo</label>
+          <div class="input-field-wrapper">
+            <span class="material-icons field-icon">person</span>
+            <input 
+              type="text" 
+              id="name" 
+              name="name"
+              [ngModel]="name()" 
+              (ngModelChange)="name.set($event)"
+              placeholder="Digite seu nome completo"
+              required
+              autocomplete="name"
+            />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="email">E-mail</label>
+          <div class="input-field-wrapper">
+            <span class="material-icons field-icon">email</span>
+            <input 
+              type="email" 
+              id="email" 
+              name="email"
+              [ngModel]="email()" 
+              (ngModelChange)="email.set($event)"
+              placeholder="Digite seu e-mail"
+              required
+              autocomplete="email"
+            />
+          </div>
+        </div>
+      }
+
       <div class="input-group">
         <label for="username">Usuário</label>
         <div class="input-field-wrapper">
-          <span class="field-icon">👤</span>
+          <span class="material-icons field-icon">account_circle</span>
           <input 
             type="text" 
             id="username" 
@@ -39,7 +83,7 @@
       <div class="input-group">
         <label for="password">Senha</label>
         <div class="input-field-wrapper">
-          <span class="field-icon">🔒</span>
+          <span class="material-icons field-icon">lock</span>
           <input 
             type="password" 
             id="password" 
@@ -52,15 +96,41 @@
         </div>
       </div>
 
+      @if (isRegisterMode()) {
+        <div class="input-group">
+          <label for="confirmPassword">Confirmar Senha</label>
+          <div class="input-field-wrapper">
+            <span class="material-icons field-icon">lock_reset</span>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              name="confirmPassword"
+              [ngModel]="confirmPassword()" 
+              (ngModelChange)="confirmPassword.set($event)"
+              placeholder="Confirme a sua senha"
+              required
+            />
+          </div>
+        </div>
+      }
+
       <button type="submit" class="submit-btn" [disabled]="isLoading()">
         @if (isLoading()) {
           <div class="spinner"></div>
-          <span>Autenticando...</span>
+          <span>{{ isRegisterMode() ? 'Cadastrando...' : 'Autenticando...' }}</span>
         } @else {
-          <span>Entrar no Painel</span>
+          <span>{{ isRegisterMode() ? 'Cadastrar' : 'Entrar no Painel' }}</span>
         }
       </button>
     </form>
+
+    <div class="mode-toggle">
+      @if (isRegisterMode()) {
+        <p>Já tem uma conta? <button type="button" class="link-btn" (click)="toggleMode()">Entrar</button></p>
+      } @else {
+        <p>Não tem uma conta? <button type="button" class="link-btn" (click)="toggleMode()">Cadastre-se</button></p>
+      }
+    </div>
 
     <div class="login-footer">
       <a routerLink="/" class="back-link">

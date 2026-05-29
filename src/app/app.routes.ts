@@ -21,7 +21,9 @@ import { superChargerResolver } from './resolvers/super-charger-resolver';
 // Novos Componentes e Guarda de Rota
 import { ProductCatalog } from './components/product-catalog/product-catalog';
 import { Login } from './components/login/login';
+import { UserProfile } from './components/user-profile/user-profile';
 import { authGuard } from './guards/auth.guard';
+import { userGuard } from './guards/user.guard';
 
 export const routes: Routes = [
   // Rota Principal Pública (Catálogo)
@@ -29,6 +31,9 @@ export const routes: Routes = [
   
   // Rota de Login do Administrador
   { path: 'login', component: Login },
+
+  // Rota do Perfil do Usuário Comum
+  { path: 'perfil', component: UserProfile, canActivate: [userGuard] },
 
   // Rotas Administrativas Protegidas (Exigem autenticação de Admin)
   { path: 'motores', component: MotorList, canActivate: [authGuard] },

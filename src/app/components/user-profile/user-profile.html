@@ -1,0 +1,303 @@
+<div class="profile-wrapper">
+  <div class="glow-bg"></div>
+
+  <div class="profile-container">
+    <!-- BARRA LATERAL / NAVEGAÇÃO -->
+    <aside class="profile-sidebar">
+      <div class="user-info-summary">
+        <div class="avatar-badge">
+          <span class="material-icons avatar-icon">account_circle</span>
+        </div>
+        <h3>{{ authService.currentUser()?.name }}</h3>
+        <span class="user-role-label">Cliente Premium</span>
+      </div>
+
+      <nav class="profile-nav">
+        <button [class.active]="activeProfileTab() === 'perfil'" (click)="setTab('perfil')">
+          <span class="material-icons">person</span> Perfil Geral
+        </button>
+        <button [class.active]="activeProfileTab() === 'seguranca'" (click)="setTab('seguranca')">
+          <span class="material-icons">security</span> Segurança
+        </button>
+        <button [class.active]="activeProfileTab() === 'wishlist'" (click)="setTab('wishlist')">
+          <span class="material-icons">favorite</span> Lista de Desejos
+          @if (wishlistItems().length) {
+            <span class="count-badge">{{ wishlistItems().length }}</span>
+          }
+        </button>
+        <button [class.active]="activeProfileTab() === 'compras'" (click)="setTab('compras')">
+          <span class="material-icons">shopping_bag</span> Minhas Compras
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" (click)="logout()">
+          <span class="material-icons">logout</span> Sair da Conta
+        </button>
+      </div>
+    </aside>
+
+    <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+    <main class="profile-content-area">
+      <header class="profile-content-header">
+        <a routerLink="/" class="back-catalog-link">
+          <span class="material-icons">arrow_back</span> Voltar ao Catálogo
+        </a>
+        <h2>Área do Cliente</h2>
+      </header>
+
+      <div class="profile-card-content">
+        
+        <!-- ABA: PERFIL GERAL -->
+        @if (activeProfileTab() === 'perfil') {
+          <section class="profile-section fade-in">
+            <div class="section-title-group">
+              <span class="material-icons title-icon">badge</span>
+              <div>
+                <h3>Informações Cadastrais</h3>
+                <p>Veja seus dados de perfil registrados no sistema.</p>
+              </div>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-card">
+                <span class="material-icons info-icon">person</span>
+                <div class="info-details">
+                  <span class="info-label">Nome Completo</span>
+                  <strong class="info-value">{{ authService.currentUser()?.name }}</strong>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <span class="material-icons info-icon">alternate_email</span>
+                <div class="info-details">
+                  <span class="info-label">Nome de Usuário</span>
+                  <strong class="info-value">&#64;{{ authService.currentUser()?.username }}</strong>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <span class="material-icons info-icon">email</span>
+                <div class="info-details">
+                  <span class="info-label">Endereço de E-mail</span>
+                  <strong class="info-value">{{ authService.currentUser()?.email || 'Não cadastrado' }}</strong>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <span class="material-icons info-icon">verified_user</span>
+                <div class="info-details">
+                  <span class="info-label">Nível de Acesso</span>
+                  <strong class="info-value">Cliente Comum</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="welcome-banner">
+              <span class="material-icons welcome-icon">speed</span>
+              <div class="welcome-text">
+                <h4>Bem-vindo à Motor-Api!</h4>
+                <p>Aqui você pode gerenciar suas preferências, ver seu histórico de compras de peças de alto desempenho e salvar seus itens favoritos diretamente do catálogo técnico.</p>
+              </div>
+            </div>
+          </section>
+        }
+
+        <!-- ABA: SEGURANÇA (ALTERAR SENHA) -->
+        @if (activeProfileTab() === 'seguranca') {
+          <section class="profile-section fade-in">
+            <div class="section-title-group">
+              <span class="material-icons title-icon">lock</span>
+              <div>
+                <h3>Segurança da Conta</h3>
+                <p>Atualize sua senha de acesso periodicamente para manter sua conta protegida.</p>
+              </div>
+            </div>
+
+            <!-- Alertas de Feedback -->
+            @if (passwordErrorMessage()) {
+              <div class="alert-container error-alert">
+                <span class="material-icons">warning</span>
+                <span>{{ passwordErrorMessage() }}</span>
+              </div>
+            }
+
+            @if (passwordSuccessMessage()) {
+              <div class="alert-container success-alert">
+                <span class="material-icons">check_circle</span>
+                <span>{{ passwordSuccessMessage() }}</span>
+              </div>
+            }
+
+            <form (ngSubmit)="onChangePassword()" class="password-change-form">
+              <div class="form-group-profile">
+                <label for="currPassword">Senha Atual</label>
+                <div class="input-wrapper-profile">
+                  <span class="material-icons">lock_open</span>
+                  <input 
+                    type="password" 
+                    id="currPassword" 
+                    [(ngModel)]="currentPassword" 
+                    name="currentPassword"
+                    placeholder="Digite sua senha atual"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group-profile">
+                <label for="newPass">Nova Senha</label>
+                <div class="input-wrapper-profile">
+                  <span class="material-icons">vpn_key</span>
+                  <input 
+                    type="password" 
+                    id="newPass" 
+                    [(ngModel)]="newPassword" 
+                    name="newPassword"
+                    placeholder="Mínimo de 6 caracteres"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group-profile">
+                <label for="confNewPass">Confirmar Nova Senha</label>
+                <div class="input-wrapper-profile">
+                  <span class="material-icons">lock_reset</span>
+                  <input 
+                    type="password" 
+                    id="confNewPass" 
+                    [(ngModel)]="confirmNewPassword" 
+                    name="confirmNewPassword"
+                    placeholder="Repita a nova senha"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button type="submit" class="submit-password-btn" [disabled]="isPasswordLoading()">
+                @if (isPasswordLoading()) {
+                  <div class="small-spinner"></div>
+                  <span>Atualizando...</span>
+                } @else {
+                  <span class="material-icons">save</span>
+                  <span>Salvar Nova Senha</span>
+                }
+              </button>
+            </form>
+          </section>
+        }
+
+        <!-- ABA: LISTA DE DESEJOS (WISHLIST) -->
+        @if (activeProfileTab() === 'wishlist') {
+          <section class="profile-section fade-in">
+            <div class="section-title-group">
+              <span class="material-icons title-icon">favorite</span>
+              <div>
+                <h3>Minha Lista de Desejos</h3>
+                <p>Estes são os componentes que você favoritou no nosso catálogo técnico de motores.</p>
+              </div>
+            </div>
+
+            <div class="wishlist-grid">
+              @for (item of wishlistItems(); track item.id + '-' + item.type) {
+                <div class="wishlist-card">
+                  <div class="wishlist-card-details">
+                    <span class="category-tag">{{ item.type.toUpperCase() }}</span>
+                    <h4>{{ item.nome }}</h4>
+                    @if (item.marca) {
+                      <span class="brand-text">Fabricante: {{ item.marca }}</span>
+                    }
+                    @if (item.preco) {
+                      <strong class="wishlist-price">{{ item.preco | currency:'BRL' }}</strong>
+                    } @else {
+                      <span class="wishlist-price-placeholder">Sob Consulta</span>
+                    }
+                  </div>
+                  <div class="wishlist-card-actions">
+                    <button class="remove-wish-btn" (click)="removeFromWishlist(item)" title="Remover dos Favoritos">
+                      <span class="material-icons">delete</span>
+                    </button>
+                  </div>
+                </div>
+              } @empty {
+                <div class="empty-state-profile">
+                  <span class="material-icons empty-icon-profile">favorite_border</span>
+                  <h4>Sua lista de desejos está vazia</h4>
+                  <p>Navegue pelo nosso catálogo e clique no coração nos produtos que você mais gostou para salvá-los aqui!</p>
+                  <a routerLink="/" class="btn-go-catalog">Explorar Catálogo</a>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- ABA: MINHAS COMPRAS (HISTÓRICO) -->
+        @if (activeProfileTab() === 'compras') {
+          <section class="profile-section fade-in">
+            <div class="section-title-group">
+              <span class="material-icons title-icon">shopping_bag</span>
+              <div>
+                <h3>Histórico de Compras</h3>
+                <p>Acompanhe o andamento dos seus pedidos de componentes mecânicos e motores.</p>
+              </div>
+            </div>
+
+            <div class="purchases-list">
+              @for (p of purchases(); track p.id) {
+                <div class="purchase-item-card">
+                  <div class="purchase-header">
+                    <div class="purchase-id">
+                      <span class="material-icons">receipt</span>
+                      <div>
+                        <strong>Pedido #{{ p.id }}</strong>
+                        <span class="purchase-date">Realizado em {{ p.data }}</span>
+                      </div>
+                    </div>
+
+                    <div class="purchase-status-badge" [class.delivered]="p.status === 'Entregue'" [class.shipping]="p.status === 'Em trânsito'">
+                      <span class="material-icons">
+                        {{ p.status === 'Entregue' ? 'check_circle' : 'local_shipping' }}
+                      </span>
+                      <span>{{ p.status }}</span>
+                    </div>
+                  </div>
+
+                  <div class="purchase-body">
+                    <div class="purchase-product-info">
+                      <span class="purchase-category">{{ p.categoria.toUpperCase() }}</span>
+                      <h4>{{ p.produto }}</h4>
+                    </div>
+
+                    <div class="purchase-financial">
+                      <span class="financial-label">Valor Total</span>
+                      <strong class="purchase-total-price">{{ p.preco | currency:'BRL' }}</strong>
+                    </div>
+                  </div>
+
+                  <div class="purchase-footer">
+                    <span class="tracking-code">
+                      <span class="material-icons">tag</span> Rastreamento: <strong>{{ p.codigoRastreio }}</strong>
+                    </span>
+                    <button class="btn-track" [disabled]="p.status === 'Entregue'">
+                      <span class="material-icons">explore</span>
+                      <span>{{ p.status === 'Entregue' ? 'Entregue no Destino' : 'Rastrear Envio' }}</span>
+                    </button>
+                  </div>
+                </div>
+              } @empty {
+                <div class="empty-state-profile">
+                  <span class="material-icons empty-icon-profile">shopping_cart</span>
+                  <h4>Nenhuma compra realizada ainda</h4>
+                  <p>Você ainda não adquiriu nenhum componente através do nosso catálogo técnico.</p>
+                  <a routerLink="/" class="btn-go-catalog">Comprar Componentes</a>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+      </div>
+    </main>
+  </div>
+</div>

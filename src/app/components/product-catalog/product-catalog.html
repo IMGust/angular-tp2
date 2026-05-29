@@ -12,16 +12,32 @@
     </div>
 
     <div class="header-actions">
+      <!-- Botão do Carrinho de Compras -->
+      <button class="cart-toggle-btn" (click)="toggleCart()" title="Abrir Carrinho">
+        <span class="material-icons">shopping_cart</span>
+        @if (cartCount() > 0) {
+          <span class="cart-badge-count">{{ cartCount() }}</span>
+        }
+      </button>
+
       @if (authService.isLoggedIn()) {
-        <div class="admin-badge">
-          <span class="indicator"></span>
-          <span>Administrador</span>
-        </div>
-        <button class="btn-primary" routerLink="/motores">Painel Administrativo</button>
+        @if (authService.isAdmin()) {
+          <div class="admin-badge">
+            <span class="indicator"></span>
+            <span>Administrador</span>
+          </div>
+          <button class="btn-primary" routerLink="/motores">Painel Administrativo</button>
+        } @else {
+          <div class="admin-badge user-badge">
+            <span class="indicator user-indicator"></span>
+            <span>Cliente</span>
+          </div>
+          <button class="btn-primary" routerLink="/perfil">Minha Conta</button>
+        }
         <button class="btn-secondary" (click)="logout()">Sair</button>
       } @else {
         <button class="btn-primary glow-btn" routerLink="/login">
-          🔑 Acesso Admin
+          🔑 Entrar
         </button>
       }
     </div>
@@ -79,6 +95,13 @@
         <div class="product-card">
           <div class="card-img-wrapper" [class.is-icon-bg]="isIcon(getProductImage(item))">
             <img [src]="getProductImage(item)" [alt]="item.nome" loading="lazy" [class.is-icon]="isIcon(getProductImage(item))" />
+            
+            <button class="wishlist-toggle-btn" 
+                    [class.in-wishlist]="isInWishlist(item)" 
+                    (click)="toggleWishlist(item); $event.stopPropagation()"
+                    title="Adicionar à Lista de Desejos">
+              <span class="material-icons">{{ isInWishlist(item) ? 'favorite' : 'favorite_border' }}</span>
+            </button>
             
             <!-- Badge Customizado por Tipo -->
             @if (activeTab() === 'motores') {
@@ -138,7 +161,12 @@
               } @else {
                 <span class="price-placeholder">Sob Consulta</span>
               }
-              <button class="btn-details" (click)="openDetails(item)">Mais Detalhes</button>
+              <div class="card-action-buttons">
+                <button class="btn-add-cart-icon" (click)="addToCart(item); $event.stopPropagation()" title="Adicionar ao Carrinho">
+                  <span class="material-icons">add_shopping_cart</span>
+                </button>
+                <button class="btn-details" (click)="openDetails(item)">Mais Detalhes</button>
+              </div>
             </div>
           </div>
         </div>
@@ -282,10 +310,254 @@
               }
             </div>
 
-            <button class="btn-modal-close" (click)="closeDetails()">Fechar Detalhes</button>
+            <div class="modal-action-buttons">
+              <button class="btn-modal-add-cart" (click)="addToCart(selectedItem())">
+                <span class="material-icons">add_shopping_cart</span> Adicionar ao Carrinho
+              </button>
+              <button class="btn-modal-close" (click)="closeDetails()">Fechar Detalhes</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   }
+
+  <!-- GAVETA/DRAWER DO CARRINHO DE COMPRAS -->
+  <div class="cart-drawer-backdrop" [class.open]="isCartOpen()" (click)="toggleCart()">
+    <div class="cart-drawer" [class.open]="isCartOpen()" (click)="$event.stopPropagation()">
+      <header class="cart-drawer-header">
+        <span class="material-icons drawer-header-icon">shopping_cart</span>
+        <h3>{{ isCheckoutStep() ? 'Finalizar Pedido' : 'Seu Carrinho' }}</h3>
+        <button class="close-drawer-btn" (click)="toggleCart()">×</button>
+      </header>
+
+      <!-- PASSO 1: LISTA DE ITENS -->
+      @if (!isCheckoutStep() && !checkoutSuccess()) {
+        <div class="drawer-body">
+          @for (item of cart(); track item.id + '-' + item.type) {
+            <div class="cart-item-row">
+              <img [src]="item.imagem" alt="Item Image" class="cart-item-img" />
+              <div class="cart-item-details">
+                <span class="cart-item-category">{{ item.type.toUpperCase() }}</span>
+                <h4>{{ item.nome }}</h4>
+                <strong class="cart-item-price">{{ item.preco | currency:'BRL' }}</strong>
+              </div>
+              <div class="cart-item-actions">
+                <div class="qty-adjuster">
+                  <button (click)="updateCartQuantity(item, -1)">-</button>
+                  <span>{{ item.quantidade }}</span>
+                  <button (click)="updateCartQuantity(item, 1)">+</button>
+                </div>
+                <button class="delete-cart-item-btn" (click)="removeFromCart(item)">
+                  <span class="material-icons">delete_outline</span>
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <div class="empty-cart-state">
+              <span class="material-icons empty-cart-icon">remove_shopping_cart</span>
+              <h4>Seu carrinho está vazio</h4>
+              <p>Explore o catálogo de componentes automotivos e adicione itens para montar sua build!</p>
+              <button class="btn-continue-shopping" (click)="toggleCart()">Continuar Comprando</button>
+            </div>
+          }
+        </div>
+
+        @if (cart().length > 0) {
+          <footer class="drawer-footer">
+            <div class="total-row">
+              <span>Subtotal:</span>
+              <strong>{{ cartSubtotal() | currency:'BRL' }}</strong>
+            </div>
+            <button class="btn-checkout" (click)="proceedToCheckout()">
+              <span>Finalizar Compra</span>
+              <span class="material-icons">arrow_forward</span>
+            </button>
+          </footer>
+        }
+      }
+
+      <!-- PASSO 2: FORMULÁRIO DE CHECKOUT -->
+      @if (isCheckoutStep() && !checkoutSuccess()) {
+        <div class="drawer-body checkout-form-container">
+          <button class="btn-back-to-cart" (click)="isCheckoutStep.set(false)">
+            <span class="material-icons">arrow_back</span> Voltar para o Carrinho
+          </button>
+
+          <form (ngSubmit)="submitCheckout()" class="checkout-form">
+            <h4 class="form-section-title"><span class="material-icons">local_shipping</span> Endereço de Entrega</h4>
+
+            <div class="form-group-checkout">
+              <label for="address">Endereço Completo</label>
+              <input 
+                type="text" 
+                id="address" 
+                placeholder="Rua, Avenida, Logradouro..." 
+                [ngModel]="endereco()" 
+                (ngModelChange)="endereco.set($event)"
+                name="endereco"
+                required 
+              />
+            </div>
+
+            <div class="checkout-grid-fields">
+              <div class="form-group-checkout">
+                <label for="houseNumber">Número (Casa)</label>
+                <input 
+                  type="text" 
+                  id="houseNumber" 
+                  placeholder="Ex: 123" 
+                  [ngModel]="numero()" 
+                  (ngModelChange)="numero.set($event)"
+                  name="numero"
+                  required 
+                />
+              </div>
+
+              <div class="form-group-checkout">
+                <label for="locationType">Local</label>
+                <select 
+                  id="locationType" 
+                  [ngModel]="local()" 
+                  (ngModelChange)="local.set($event)"
+                  name="local"
+                >
+                  <option value="Casa">Casa</option>
+                  <option value="Apartamento">Apartamento</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group-checkout">
+              <label for="refPoint">Ponto de Referência</label>
+              <input 
+                type="text" 
+                id="refPoint" 
+                placeholder="Ex: Próximo à padaria..." 
+                [ngModel]="referencia()" 
+                (ngModelChange)="referencia.set($event)"
+                name="referencia"
+                required 
+              />
+            </div>
+
+            <h4 class="form-section-title"><span class="material-icons">payment</span> Forma de Pagamento</h4>
+            
+            <div class="payment-methods-group">
+              <label class="payment-card-option" [class.selected]="metodoPagamento() === 'credito'">
+                <input 
+                  type="radio" 
+                  name="paymentMethod" 
+                  value="credito" 
+                  [ngModel]="metodoPagamento()" 
+                  (ngModelChange)="metodoPagamento.set($event)"
+                />
+                <span class="material-icons">credit_card</span>
+                <span>Cartão de Crédito</span>
+              </label>
+
+              <label class="payment-card-option" [class.selected]="metodoPagamento() === 'debito'">
+                <input 
+                  type="radio" 
+                  name="paymentMethod" 
+                  value="debito" 
+                  [ngModel]="metodoPagamento()" 
+                  (ngModelChange)="metodoPagamento.set($event)"
+                />
+                <span class="material-icons">payment</span>
+                <span>Cartão de Débito</span>
+              </label>
+            </div>
+
+            <!-- Dados decorativos de cartão para realismo extremo -->
+            <div class="card-details-section">
+              <div class="form-group-checkout">
+                <label for="cardNum">Número do Cartão</label>
+                <input 
+                  type="text" 
+                  id="cardNum" 
+                  placeholder="0000 0000 0000 0000" 
+                  [ngModel]="numCartao()" 
+                  (ngModelChange)="numCartao.set($event)"
+                  name="numCartao"
+                />
+              </div>
+
+              <div class="form-group-checkout">
+                <label for="cardHolder">Nome Impresso</label>
+                <input 
+                  type="text" 
+                  id="cardHolder" 
+                  placeholder="Ex: GUSTAVO D SOUZA" 
+                  [ngModel]="nomeCartao()" 
+                  (ngModelChange)="nomeCartao.set($event)"
+                  name="nomeCartao"
+                />
+              </div>
+
+              <div class="checkout-grid-fields">
+                <div class="form-group-checkout">
+                  <label for="cardExpiry">Validade</label>
+                  <input 
+                    type="text" 
+                    id="cardExpiry" 
+                    placeholder="MM/AA" 
+                    [ngModel]="validadeCartao()" 
+                    (ngModelChange)="validadeCartao.set($event)"
+                    name="validadeCartao"
+                  />
+                </div>
+
+                <div class="form-group-checkout">
+                  <label for="cardCvv">CVV</label>
+                  <input 
+                    type="text" 
+                    id="cardCvv" 
+                    placeholder="000" 
+                    [ngModel]="cvvCartao()" 
+                    (ngModelChange)="cvvCartao.set($event)"
+                    name="cvvCartao"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <footer class="drawer-checkout-footer">
+              <div class="total-checkout-row">
+                <span>Total a Pagar:</span>
+                <strong>{{ cartSubtotal() | currency:'BRL' }}</strong>
+              </div>
+              
+              <button type="submit" class="btn-place-order" [disabled]="isProcessingCheckout()">
+                @if (isProcessingCheckout()) {
+                  <div class="checkout-spinner"></div>
+                  <span>Processando...</span>
+                } @else {
+                  <span class="material-icons">lock</span>
+                  <span>Confirmar e Pagar</span>
+                }
+              </button>
+            </footer>
+          </form>
+        </div>
+      }
+
+      <!-- PASSO 3: SUCESSO DO CHECKOUT -->
+      @if (checkoutSuccess()) {
+        <div class="drawer-body success-checkout-container">
+          <span class="material-icons success-checkout-icon">check_circle</span>
+          <h3>Compra Realizada!</h3>
+          <p>Seu pedido de componentes de alta performance foi processado com sucesso.</p>
+          <div class="success-actions">
+            <button class="btn-profile-redirect" routerLink="/perfil" (click)="toggleCart()">
+              <span class="material-icons">receipt_long</span> Acompanhar Pedido
+            </button>
+            <button class="btn-success-close" (click)="toggleCart()">
+              Voltar ao Catálogo
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
 </div>

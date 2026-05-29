@@ -42,9 +42,11 @@
       </nav>
 
       <div class="sidebar-user">
-        <div class="user-avatar">G</div>
+        <div class="user-avatar">
+          {{ authService.currentUser()?.name?.charAt(0)?.toUpperCase() || 'U' }}
+        </div>
         <div class="user-details">
-          <p class="user-name">Gustavo</p>
+          <p class="user-name">{{ authService.currentUser()?.name || 'Usuário' }}</p>
           <p class="user-status">Online</p>
         </div>
         <!-- Botão de Sair do Painel -->
