@@ -1,0 +1,291 @@
+<div class="catalog-container">
+  <!-- HEADER PÚBLICO -->
+  <header class="catalog-header">
+    <div class="brand">
+      <div class="brand-logo">
+        <img src="logo.png" alt="Motor-Api Logo" class="logo-img" />
+      </div>
+      <div class="brand-info">
+        <h1>Motor-Api</h1>
+        <span>CATÁLOGO TÉCNICO</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      @if (authService.isLoggedIn()) {
+        <div class="admin-badge">
+          <span class="indicator"></span>
+          <span>Administrador</span>
+        </div>
+        <button class="btn-primary" routerLink="/motores">Painel Administrativo</button>
+        <button class="btn-secondary" (click)="logout()">Sair</button>
+      } @else {
+        <button class="btn-primary glow-btn" routerLink="/login">
+          🔑 Acesso Admin
+        </button>
+      }
+    </div>
+  </header>
+
+
+
+  <!-- NAVEGAÇÃO E BUSCA -->
+  <div class="catalog-controls">
+    <nav class="catalog-tabs">
+      <button [class.active]="activeTab() === 'motores'" (click)="setTab('motores')">
+        <img src="motor.png" alt="Motores" class="tab-icon" /> Motores
+      </button>
+      <button [class.active]="activeTab() === 'pistoes'" (click)="setTab('pistoes')">
+        <img src="pistao.png" alt="Pistões" class="tab-icon" /> Pistões
+      </button>
+      <button [class.active]="activeTab() === 'radiadores'" (click)="setTab('radiadores')">
+        <img src="radiador.png" alt="Radiadores" class="tab-icon" /> Radiadores
+      </button>
+      <button [class.active]="activeTab() === 'turbos'" (click)="setTab('turbos')">
+        <img src="turbo.png" alt="Turbos" class="tab-icon" /> Turbos
+      </button>
+      <button [class.active]="activeTab() === 'superchargers'" (click)="setTab('superchargers')">
+        <span class="tab-emoji">⚡</span> Superchargers
+      </button>
+      <button [class.active]="activeTab() === 'veiculos'" (click)="setTab('veiculos')">
+        <span class="tab-emoji">🏎️</span> Veículos
+      </button>
+    </nav>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        placeholder="Buscar pelo nome, marca ou fabricante..." 
+        [ngModel]="searchQuery()" 
+        (ngModelChange)="searchQuery.set($event)"
+      />
+      @if (searchQuery()) {
+        <button class="clear-search" (click)="searchQuery.set('')">×</button>
+      }
+    </div>
+  </div>
+
+  <!-- LOADING SPINNER -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner-large"></div>
+      <p>Carregando componentes técnicos...</p>
+    </div>
+  } @else {
+    <!-- GRID DE CARDS -->
+    <div class="products-grid">
+      @for (item of filteredItems(); track item.id) {
+        <div class="product-card">
+          <div class="card-img-wrapper" [class.is-icon-bg]="isIcon(getProductImage(item))">
+            <img [src]="getProductImage(item)" [alt]="item.nome" loading="lazy" [class.is-icon]="isIcon(getProductImage(item))" />
+            
+            <!-- Badge Customizado por Tipo -->
+            @if (activeTab() === 'motores') {
+              <span class="card-badge orange">{{ item.potencia }} cv</span>
+            } @else if (activeTab() === 'pistoes') {
+              <span class="card-badge blue">{{ item.marca || 'Pistão' }}</span>
+            } @else if (activeTab() === 'radiadores') {
+              <span class="card-badge cyan">{{ item.marca || 'Radiador' }}</span>
+            } @else if (activeTab() === 'turbos') {
+              <span class="card-badge purple">{{ item.fabricante || 'Turbo' }}</span>
+            } @else if (activeTab() === 'superchargers') {
+              <span class="card-badge yellow">{{ item.fabricante || 'Supercharger' }}</span>
+            } @else if (activeTab() === 'veiculos') {
+              <span class="card-badge red">{{ item.ano }}</span>
+            }
+          </div>
+
+          <div class="card-content">
+            <!-- Nomes Dinâmicos baseados no tipo do item -->
+            <h3>
+              {{ item.nome || item.modelo || (activeTab() === 'pistoes' ? 'Pistão Forjado' : '') || (activeTab() === 'radiadores' ? 'Radiador de Alumínio' : '') || (activeTab() === 'turbos' ? 'Turbina Performance' : '') || (activeTab() === 'superchargers' ? 'Supercharger Mecânico' : '') }}
+            </h3>
+            
+            <div class="specs-list">
+              <!-- Atributos Dinâmicos -->
+              @if (activeTab() === 'motores') {
+                <div class="spec-row"><span>Cilindrada:</span> <strong>{{ item.cilindrada }} cc</strong></div>
+                <div class="spec-row"><span>Torque:</span> <strong>{{ item.torque }} kgfm</strong></div>
+                <div class="spec-row"><span>RPM Máx:</span> <strong>{{ item.rpmMax }} RPM</strong></div>
+              } @else if (activeTab() === 'pistoes') {
+                <div class="spec-row"><span>Material:</span> <strong>{{ item.material }}</strong></div>
+                <div class="spec-row"><span>Diâmetro:</span> <strong>{{ item.diametro }} mm</strong></div>
+                <div class="spec-row"><span>Curso:</span> <strong>{{ item.curso }} mm</strong></div>
+              } @else if (activeTab() === 'radiadores') {
+                <div class="spec-row"><span>Tipo:</span> <strong>{{ item.tipo }}</strong></div>
+                <div class="spec-row"><span>Fluido:</span> <strong>{{ item.capacidadeFluidoLitros }} L</strong></div>
+                <div class="spec-row"><span>Dissipação:</span> <strong>{{ item.dissipacaoTermicaBTU }} BTU</strong></div>
+              } @else if (activeTab() === 'turbos') {
+                <div class="spec-row"><span>Tipo Turbo:</span> <strong>{{ item.tipoTurbo }}</strong></div>
+                <div class="spec-row"><span>Boost:</span> <strong>{{ item.pressaoBoost }} bar</strong></div>
+                <div class="spec-row"><span>Intercooler:</span> <strong>{{ item.possuiIntercooler ? 'Sim' : 'Não' }}</strong></div>
+              } @else if (activeTab() === 'superchargers') {
+                <div class="spec-row"><span>Tipo:</span> <strong>{{ item.tipoSupercharger }}</strong></div>
+                <div class="spec-row"><span>Polia:</span> <strong>{{ item.tamanhoPolia }} mm</strong></div>
+                <div class="spec-row"><span>Correia:</span> <strong>{{ item.padraoCorreia }}</strong></div>
+              } @else if (activeTab() === 'veiculos') {
+                <div class="spec-row"><span>Modelo:</span> <strong>{{ item.modelo }}</strong></div>
+                <div class="spec-row"><span>Ano:</span> <strong>{{ item.ano }}</strong></div>
+                <div class="spec-row"><span>Motores:</span> <strong>{{ item.motores?.length || 0 }} vinculado(s)</strong></div>
+              }
+            </div>
+
+            <div class="card-footer">
+              <!-- Preço formatado (se houver preco no model) -->
+              @if (item.preco !== undefined) {
+                <span class="price">{{ item.preco | currency:'BRL' }}</span>
+              } @else {
+                <span class="price-placeholder">Sob Consulta</span>
+              }
+              <button class="btn-details" (click)="openDetails(item)">Mais Detalhes</button>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-catalog">
+          <span class="empty-icon">📂</span>
+          <h3>Nenhum item encontrado</h3>
+          <p>Nenhum componente mecânico corresponde à sua pesquisa na categoria selecionada.</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- MODAL DE DETALHES -->
+  @if (selectedItem()) {
+    <div class="modal-overlay" (click)="closeDetails()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <button class="modal-close" (click)="closeDetails()">×</button>
+        
+        <div class="modal-layout">
+          <div class="modal-img-section" [class.is-icon-bg]="isIcon(getSelectedProductImage(selectedItem()))">
+            <img [src]="getSelectedProductImage(selectedItem())" [alt]="selectedItem().nome" [class.is-icon]="isIcon(getSelectedProductImage(selectedItem()))" />
+            
+            @if (selectedItem().preco !== undefined) {
+              <div class="price-tag">
+                {{ selectedItem().preco | currency:'BRL' }}
+              </div>
+            }
+
+            @if (selectedItem().imagens && selectedItem().imagens.length > 1) {
+              <div class="modal-thumbnails">
+                @for (img of selectedItem().imagens; track img.fid; let idx = $index) {
+                  <div class="thumb-wrapper" [class.active]="activeImageIndex() === idx" (click)="activeImageIndex.set(idx)">
+                    <img [src]="'http://localhost:8080/motor/images/download/' + img.fid" [alt]="selectedItem().nome" />
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="modal-info-section">
+            <span class="modal-category">{{ activeTab().toUpperCase() }}</span>
+            <h2>
+              {{ selectedItem().nome || selectedItem().modelo || (activeTab() === 'pistoes' ? 'Pistão de Alto Desempenho' : '') || (activeTab() === 'radiadores' ? 'Radiador Especializado' : '') || (activeTab() === 'turbos' ? 'Sistema Turbocharger' : '') || (activeTab() === 'superchargers' ? 'Supercharger Premium' : '') }}
+            </h2>
+
+            <div class="technical-table">
+              <h3>Especificações Técnicas</h3>
+              
+              <!-- Especificações completas por tipo de produto -->
+              @if (activeTab() === 'motores') {
+                <div class="table-row"><span>Cilindrada</span><strong>{{ selectedItem().cilindrada }} cc</strong></div>
+                <div class="table-row"><span>Potência</span><strong>{{ selectedItem().potencia }} cv</strong></div>
+                <div class="table-row"><span>Torque</span><strong>{{ selectedItem().torque }} kgfm</strong></div>
+                <div class="table-row"><span>Taxa de Compressão</span><strong>{{ selectedItem().taxaCompressao }}:1</strong></div>
+                <div class="table-row"><span>Giro Máximo</span><strong>{{ selectedItem().rpmMax }} RPM</strong></div>
+                
+                <!-- Relações -->
+                @if (selectedItem().sobrealimentacao) {
+                  <div class="table-row"><span>Sobrealimentação</span><strong>{{ selectedItem().sobrealimentacao.tipo || selectedItem().sobrealimentacao.nome || 'Sim' }}</strong></div>
+                }
+              } @else if (activeTab() === 'pistoes') {
+                <div class="table-row"><span>Material</span><strong>{{ selectedItem().material }}</strong></div>
+                <div class="table-row"><span>Diâmetro</span><strong>{{ selectedItem().diametro }} mm</strong></div>
+                <div class="table-row"><span>Curso</span><strong>{{ selectedItem().curso }} mm</strong></div>
+                <div class="table-row"><span>Volume do Domo</span><strong>{{ selectedItem().volumeDomo }} cc</strong></div>
+                <div class="table-row"><span>Marca</span><strong>{{ selectedItem().marca }}</strong></div>
+              } @else if (activeTab() === 'radiadores') {
+                <div class="table-row"><span>Tipo de Construção</span><strong>{{ selectedItem().tipo }}</strong></div>
+                <div class="table-row"><span>Capacidade de Fluido</span><strong>{{ selectedItem().capacidadeFluidoLitros }} L</strong></div>
+                <div class="table-row"><span>Dissipação Térmica</span><strong>{{ selectedItem().dissipacaoTermicaBTU }} BTU</strong></div>
+                <div class="table-row"><span>Fileiras</span><strong>{{ selectedItem().fileiras }} fileiras</strong></div>
+                <div class="table-row"><span>Marca</span><strong>{{ selectedItem().marca }}</strong></div>
+              } @else if (activeTab() === 'turbos') {
+                <div class="table-row"><span>Tipo de Turbo</span><strong>{{ selectedItem().tipoTurbo }}</strong></div>
+                <div class="table-row"><span>Pressão Boost</span><strong>{{ selectedItem().pressaoBoost }} bar</strong></div>
+                <div class="table-row"><span>Intercooler Integrado</span><strong>{{ selectedItem().possuiIntercooler ? 'Sim' : 'Não' }}</strong></div>
+                <div class="table-row"><span>Quantidade</span><strong>{{ selectedItem().quantidade }}x</strong></div>
+                <div class="table-row"><span>Fabricante</span><strong>{{ selectedItem().fabricante }}</strong></div>
+                <div class="table-row"><span>Lado Escape / Admissão</span><strong>A/R {{ selectedItem().ladoEscape }} / A/R {{ selectedItem().ladoAdmissao }}</strong></div>
+              } @else if (activeTab() === 'superchargers') {
+                <div class="table-row"><span>Tipo de Compressor</span><strong>{{ selectedItem().tipoSupercharger }}</strong></div>
+                <div class="table-row"><span>Tamanho da Polia</span><strong>{{ selectedItem().tamanhoPolia }} mm</strong></div>
+                <div class="table-row"><span>Padrão de Correia</span><strong>{{ selectedItem().padraoCorreia }}</strong></div>
+                @if (selectedItem().acionamento) {
+                  <div class="table-row"><span>Acionamento</span><strong>{{ selectedItem().acionamento }}</strong></div>
+                }
+                <div class="table-row"><span>Fabricante</span><strong>{{ selectedItem().fabricante }}</strong></div>
+              } @else if (activeTab() === 'veiculos') {
+                <div class="table-row"><span>Fabricante/Modelo</span><strong>{{ selectedItem().modelo }}</strong></div>
+                <div class="table-row"><span>Ano de Fabricação</span><strong>{{ selectedItem().ano }}</strong></div>
+              }
+            </div>
+
+            <!-- COMPATIBILIDADES E VINCULAÇÕES -->
+            <div class="compatibility-section">
+              @if (activeTab() === 'motores') {
+                <h3>Compatibilidades Vinculadas</h3>
+                <div class="badge-group">
+                  @if (selectedItem().veiculosCompativeis?.length) {
+                    <div class="comp-category">
+                      <strong>Veículos:</strong>
+                      <div class="badges">
+                        @for (v of selectedItem().veiculosCompativeis; track v.id) {
+                          <span class="comp-badge red">{{ v.nome }} ({{ v.modelo }})</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (selectedItem().pistoes?.length) {
+                    <div class="comp-category">
+                      <strong>Pistões:</strong>
+                      <div class="badges">
+                        @for (p of selectedItem().pistoes; track p.id) {
+                          <span class="comp-badge blue">{{ p.marca }} ({{ p.material }})</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (selectedItem().radiadores?.length) {
+                    <div class="comp-category">
+                      <strong>Radiadores:</strong>
+                      <div class="badges">
+                        @for (r of selectedItem().radiadores; track r.id) {
+                          <span class="comp-badge cyan">{{ r.marca }} - {{ r.capacidadeFluidoLitros }}L</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (!selectedItem().veiculosCompativeis?.length && !selectedItem().pistoes?.length && !selectedItem().radiadores?.length) {
+                    <p class="no-comp">Nenhum componente secundário cadastrado.</p>
+                  }
+                </div>
+              } @else if (activeTab() === 'veiculos' && selectedItem().motores?.length) {
+                <h3>Motores Compatíveis</h3>
+                <div class="badges">
+                  @for (m of selectedItem().motores; track m.id) {
+                    <span class="comp-badge orange">{{ m.nome }} ({{ m.potencia }} cv)</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <button class="btn-modal-close" (click)="closeDetails()">Fechar Detalhes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

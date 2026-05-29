@@ -1,0 +1,97 @@
+<div class="form-container">
+  <div class="header">
+    <h2>{{ form.get('id')?.value ? 'Editar Turbo' : 'Novo Turbo' }}</h2>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="fabricante">Fabricante</label>
+        <input id="fabricante" type="text" formControlName="fabricante" placeholder="Ex: Garrett">
+      </div>
+
+      <div class="form-group">
+        <label for="tipoTurbo">Tipo Turbo</label>
+        <select id="tipoTurbo" formControlName="tipoTurbo">
+          <option value="">Selecione...</option>
+          @for (tipo of tiposTurbo; track tipo) {
+            <option [value]="tipo">{{ tipo }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="pressaoBoost">Pressão Boost (bar)</label>
+        <input id="pressaoBoost" type="number" formControlName="pressaoBoost" placeholder="0.0" step="0.1">
+      </div>
+
+      <div class="form-group">
+        <label for="quantidade">Quantidade</label>
+        <input id="quantidade" type="number" formControlName="quantidade" placeholder="1">
+      </div>
+
+      <div class="form-group">
+        <label for="ladoEscape">Lado Escape (mm)</label>
+        <input id="ladoEscape" type="number" formControlName="ladoEscape" placeholder="0.0" step="0.1">
+      </div>
+
+      <div class="form-group">
+        <label for="ladoAdmissao">Lado Admissão (mm)</label>
+        <input id="ladoAdmissao" type="number" formControlName="ladoAdmissao" placeholder="0.0" step="0.1">
+      </div>
+
+      <div class="form-group">
+        <label for="idTipoFlange">Tipo Flange</label>
+        <select id="idTipoFlange" formControlName="idTipoFlange">
+          <option [ngValue]="null">Selecione...</option>
+          @for (flange of tiposFlange; track flange.id) {
+            <option [value]="flange.id">{{ flange.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="idTipoMancal">Tipo Mancal</label>
+        <select id="idTipoMancal" formControlName="idTipoMancal">
+          <option [ngValue]="null">Selecione...</option>
+          @for (mancal of tiposMancal; track mancal.id) {
+            <option [value]="mancal.id">{{ mancal.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="idTipoWastegate">Wastegate</label>
+        <select id="idTipoWastegate" formControlName="idTipoWastegate">
+          <option [ngValue]="null">Selecione...</option>
+          @for (w of tiposWastegate; track w.id) {
+            <option [value]="w.id">{{ w.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="idSistemaRefrigeracao">Refrigeração</label>
+        <select id="idSistemaRefrigeracao" formControlName="idSistemaRefrigeracao">
+          <option [ngValue]="null">Selecione...</option>
+          @for (s of sistemasRefrigeracao; track s.id) {
+            <option [value]="s.id">{{ s.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" formControlName="possuiIntercooler"> Possui Intercooler
+        </label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" routerLink="/turbos" class="btn btn-secondary">Cancelar</button>
+      <button type="submit" [disabled]="form.invalid" class="btn btn-primary">
+        {{ form.get('id')?.value ? 'Salvar Alterações' : 'Cadastrar Turbo' }}
+      </button>
+    </div>
+  </form>
+</div>

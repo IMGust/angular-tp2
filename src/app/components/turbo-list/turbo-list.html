@@ -1,0 +1,50 @@
+<div class="header">
+  <h2>Turbos</h2>
+</div>
+
+<div class="table-container">
+  <table class="motor-table">
+    <thead>
+      <tr>
+        <th>Fabricante</th>
+        <th>Tipo</th>
+        <th>Pressão (bar)</th>
+        <th>Quantidade</th>
+        <th>Intercooler</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of turbos(); track item.id) {
+        <tr>
+          <td>{{ item.fabricante }}</td>
+          <td>{{ item.tipoTurbo }}</td>
+          <td>{{ item.pressaoBoost }}</td>
+          <td>{{ item.quantidade }}</td>
+          <td>{{ item.possuiIntercooler ? 'Sim' : 'Não' }}</td>
+          <td>
+            <div class="actions">
+              <a [routerLink]="['/turbos/editar', item.id]" class="btn-icon edit" title="Editar">
+                <i class="icon-edit">✏️</i>
+              </a>
+              <button (click)="excluir(item.id)" class="btn-icon delete" title="Excluir">
+                <i class="icon-delete">🗑️</i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="empty-state">Nenhum turbo cadastrado.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<mat-paginator [length]="totalElements()"
+               [pageSize]="pageSize()"
+               [pageSizeOptions]="[5, 10, 25, 100]"
+               (page)="onPageChange($event)"
+               aria-label="Selecione a página">
+</mat-paginator>
